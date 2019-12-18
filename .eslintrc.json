@@ -1,0 +1,6 @@
+{
+  "extends": "@apollo-elements",
+  "rules": {
+    "prefer-object-spread": 0
+  }
+}
