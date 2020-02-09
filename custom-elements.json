@@ -8,7 +8,7 @@
         {
           "name": "whitelist",
           "description": "Whitelist of keys for the object.\nRequired if setting `object` to a non-serializable object (e.g. an HTMLElement)",
-          "type": "String[]"
+          "type": "string[]"
         }
       ],
       "properties": [
@@ -21,10 +21,24 @@
           "name": "whitelist",
           "attribute": "whitelist",
           "description": "Whitelist of keys for the object.\nRequired if setting `object` to a non-serializable object (e.g. an HTMLElement)",
-          "type": "String[]"
+          "type": "string[]"
+        }
+      ],
+      "slots": [
+        {
+          "name": "",
+          "description": "JSON strings appended as text nodes will be parsed and displayed"
         }
       ],
       "cssProperties": [
+        {
+          "name": "--json-viewer-color",
+          "description": "Color for generic text. Light white, Dark #212121"
+        },
+        {
+          "name": "--json-viewer-backgroun",
+          "description": "Color for generic text. Light #212121, Dark white"
+        },
         {
           "name": "--json-viewer-key-color",
           "description": "Color for keys. Light #f76707, Dark #ff922b"

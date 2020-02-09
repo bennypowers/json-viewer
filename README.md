@@ -30,14 +30,22 @@ render(template, document.body);
 | Property    | Attribute   | Type       | Description                                      |
 |-------------|-------------|------------|--------------------------------------------------|
 | `object`    |             | `object`   | Object to display                                |
-| `whitelist` | `whitelist` | `String[]` | Whitelist of keys for the object.<br />Required if setting `object` to a non-serializable object (e.g. an HTMLElement) |
+| `whitelist` | `whitelist` | `string[]` | Whitelist of keys for the object.<br />Required if setting `object` to a non-serializable object (e.g. an HTMLElement) |
+
+## Slots
+
+| Name | Description                                      |
+|------|--------------------------------------------------|
+|      | JSON strings appended as text nodes will be parsed and displayed |
 
 ## CSS Custom Properties
 
-| Property                      | Description                                     |
-|-------------------------------|-------------------------------------------------|
-| `--json-viewer-boolean-color` | Color for booleans. Light #f76707, Dark #22b8cf |
-| `--json-viewer-key-color`     | Color for keys. Light #f76707, Dark #ff922b     |
-| `--json-viewer-null-color`    | Color for nulls. Light #e03131, Dark #ff6b6b    |
-| `--json-viewer-number-color`  | Color for numbers. Light #0ca678, Dark #51cf66  |
-| `--json-viewer-string-color`  | Color for strings. Light #0c8599, Dark #22b8cf  |
+| Property                      | Description                                      |
+|-------------------------------|--------------------------------------------------|
+| `--json-viewer-backgroun`     | Color for generic text. Light #212121, Dark white |
+| `--json-viewer-boolean-color` | Color for booleans. Light #f76707, Dark #22b8cf  |
+| `--json-viewer-color`         | Color for generic text. Light white, Dark #212121 |
+| `--json-viewer-key-color`     | Color for keys. Light #f76707, Dark #ff922b      |
+| `--json-viewer-null-color`    | Color for nulls. Light #e03131, Dark #ff6b6b     |
+| `--json-viewer-number-color`  | Color for numbers. Light #0ca678, Dark #51cf66   |
+| `--json-viewer-string-color`  | Color for strings. Light #0c8599, Dark #22b8cf   |

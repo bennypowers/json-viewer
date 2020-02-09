@@ -33,6 +33,7 @@ const wrapStrings = replace(/"<mark(.*)>(.*)<\/mark>"/g, (_, attrs, content) =>
 const json = compose(wrapStrings, markKeys, pretty, stripUndefined);
 
 const css = `
+[hidden],
 :host([hidden]) {
   display: none !important;
 }
@@ -41,6 +42,8 @@ const css = `
   display: block;
   position: relative;
   padding: 10px;
+  color: var(--json-viewer-color, currentColor);
+  background: var(--json-viewer-background);
 }
 
 mark { background: none; }
@@ -52,8 +55,8 @@ mark.string { color: var(--json-viewer-string-color); }
 
 @media (prefers-color-scheme: dark), (prefers-color-scheme: no-preference) {
   :host {
-    color: white;
-    background: #212529;
+    --json-viewer-color: white;
+    --json-viewer-background: #212529;
     --json-viewer-key-color: #ff922b;
     --json-viewer-boolean-color: #22b8cf;
     --json-viewer-number-color: #51cf66;
@@ -64,8 +67,8 @@ mark.string { color: var(--json-viewer-string-color); }
 
 @media (prefers-color-scheme: light) {
   :host {
-    color: #212529;
-    background: white;
+    --json-viewer-color: #212529;
+    --json-viewer-background: white;
     --json-viewer-key-color: #f76707;
     --json-viewer-boolean-color: #0c8599;
     --json-viewer-number-color: #0ca678;
@@ -110,11 +113,15 @@ const WLATTR = 'whitelist';
  * </json-viewer>
  * ```
  *
+ * @cssprop --json-viewer-color - Color for generic text. Light white, Dark #212121
+ * @cssprop --json-viewer-background - Color for generic text. Light #212121, Dark white
  * @cssprop --json-viewer-key-color - Color for keys. Light #f76707, Dark #ff922b
  * @cssprop --json-viewer-boolean-color - Color for booleans. Light #f76707, Dark #22b8cf
  * @cssprop --json-viewer-number-color - Color for numbers. Light #0ca678, Dark #51cf66
  * @cssprop --json-viewer-null-color - Color for nulls. Light #e03131, Dark #ff6b6b
  * @cssprop --json-viewer-string-color - Color for strings. Light #0c8599, Dark #22b8cf
+ *
+ * @slot - JSON strings appended as text nodes will be parsed and displayed
  */
 export class JsonViewer extends HTMLElement {
   static get is() {
@@ -141,7 +148,7 @@ export class JsonViewer extends HTMLElement {
   /**
    * Whitelist of keys for the object.
    * Required if setting `object` to a non-serializable object (e.g. an HTMLElement)
-   * @type {String[]}
+   * @type {string[]}
    * @attr
    */
   get whitelist() {
@@ -149,18 +156,13 @@ export class JsonViewer extends HTMLElement {
   }
 
   set whitelist(val) {
-    if (!isAllStrings(val))
-    { throw new Error('whitelist must be an array of strings'); }
+    if (!isAllStrings(val)) {
+      throw new Error('whitelist must be an array of strings');
+    }
     this.__whitelist = val;
     const attr = val.join(',');
     this.setAttribute(WLATTR, attr);
     this.render();
-  }
-
-  get __highlighted() {
-    const { whitelist, object } = this;
-    return object === undefined ?
-      '' : json(whitelist ? pick(whitelist, object) : object);
   }
 
   constructor() {
@@ -186,10 +188,21 @@ export class JsonViewer extends HTMLElement {
     this.parse();
   }
 
+  /**
+   * @private
+   * @return {string} syntax-highlighted HTML string
+   */
+  getHighlightedDomString() {
+    const { whitelist, object } = this;
+    return object === undefined ?
+      '' : json(whitelist ? pick(whitelist, object) : object);
+  }
+
   /** @private */
   render() {
-    this.shadowRoot.querySelector('code').hidden = !this.__highlighted;
-    this.shadowRoot.querySelector('pre').innerHTML = this.__highlighted;
+    const highlighted = this.getHighlightedDomString();
+    this.shadowRoot.querySelector('code').hidden = !highlighted;
+    this.shadowRoot.querySelector('pre').innerHTML = highlighted;
   }
 
   /** @private */
