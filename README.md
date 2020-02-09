@@ -42,7 +42,7 @@ render(template, document.body);
 
 | Property                      | Description                                      |
 |-------------------------------|--------------------------------------------------|
-| `--json-viewer-backgroun`     | Color for generic text. Light #212121, Dark white |
+| `--json-viewer-background`    | Color for generic text. Light #212121, Dark white |
 | `--json-viewer-boolean-color` | Color for booleans. Light #f76707, Dark #22b8cf  |
 | `--json-viewer-color`         | Color for generic text. Light white, Dark #212121 |
 | `--json-viewer-key-color`     | Color for keys. Light #f76707, Dark #ff922b      |

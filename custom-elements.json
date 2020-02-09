@@ -36,7 +36,7 @@
           "description": "Color for generic text. Light white, Dark #212121"
         },
         {
-          "name": "--json-viewer-backgroun",
+          "name": "--json-viewer-background",
           "description": "Color for generic text. Light #212121, Dark white"
         },
         {
