@@ -41,7 +41,6 @@ const css = `
 :host {
   display: block;
   position: relative;
-  padding: 10px;
   color: var(--json-viewer-color, currentColor);
   background: var(--json-viewer-background);
 }
