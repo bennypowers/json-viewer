@@ -1,5 +1,5 @@
 {
-  "extends": "@apollo-elements",
+  "extends": "@pwrs",
   "rules": {
     "prefer-object-spread": 0
   }

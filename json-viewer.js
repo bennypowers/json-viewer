@@ -4,12 +4,12 @@ const trim = s => s.trim();
 const isObject = x => x !== null && `${x}` === '[object Object]';
 const replace = (...args) => s => s.replace(...args);
 const isAllStrings = xs => Array.isArray(xs) && xs.every(isString);
-const fromEntries = xs => Object.fromEntries ? Object.fromEntries(xs) :
-  xs.reduce((o, [k, v]) => Object.assign({ [k]: v }, o), {});
+const fromEntries = xs => Object.fromEntries ? Object.fromEntries(xs)
+  : xs.reduce((o, [k, v]) => ({ [k]: v, ...o }), {});
 const flatMap = f => xs =>
   'flatMap' in Array.prototype ?
-    xs.flatMap(f) :
-    xs.reduce((acc, x) => acc.concat(f(x)), []);
+    xs.flatMap(f)
+    : xs.reduce((acc, x) => acc.concat(f(x)), []);
 
 const pick = (keys, element) =>
   keys.reduce((pojo, key) =>
@@ -19,9 +19,9 @@ const stripUndefinedVals = flatMap(([k, v]) => v === undefined ? [] : [[k, v]]);
 const stripUndefined = compose(fromEntries, stripUndefinedVals, Object.entries);
 
 const mark = x =>
-    x instanceof Element ? `<mark class='string'>${x.outerHTML.replace(/</g, '&lt;').replace(/"/g, '\'')}</mark>` :
-  isObject(x) || Array.isArray(x) ? x :
-  `<mark class='${x === null ? 'null' : typeof x}'>${x}</mark>`;
+    x instanceof Element ? `<mark class='string'>${x.outerHTML.replace(/</g, '&lt;').replace(/"/g, '\'')}</mark>`
+  : isObject(x) || Array.isArray(x) ? x
+  : `<mark class='${x === null ? 'null' : typeof x}'>${x}</mark>`;
 
 const replacer = (k, v) => k === '' ? v : mark(v);
 const pretty = o => JSON.stringify(o, replacer, 2);
@@ -45,6 +45,7 @@ const css = `
   background: var(--json-viewer-background);
 }
 
+code { white-space: pre; }
 mark { background: none; }
 mark.key { color: var(--json-viewer-key-color); }
 mark.boolean { color: var(--json-viewer-boolean-color); }
@@ -78,11 +79,7 @@ mark.string { color: var(--json-viewer-string-color); }
 `;
 
 const template = document.createElement('template');
-template.innerHTML = `
-<code hidden>
-  <pre></pre>
-</code>
-`;
+template.innerHTML = `<code hidden part="code"></code>`;
 
 const WLATTR = 'whitelist';
 
@@ -120,6 +117,8 @@ const WLATTR = 'whitelist';
  * @cssprop --json-viewer-null-color - Color for nulls. Light #e03131, Dark #ff6b6b
  * @cssprop --json-viewer-string-color - Color for strings. Light #0c8599, Dark #22b8cf
  *
+ * @part code - the wrapping `<code>` element
+ *
  * @slot - JSON strings appended as text nodes will be parsed and displayed
  */
 export class JsonViewer extends HTMLElement {
@@ -155,9 +154,9 @@ export class JsonViewer extends HTMLElement {
   }
 
   set whitelist(val) {
-    if (!isAllStrings(val)) {
+    if (!isAllStrings(val))
       throw new Error('whitelist must be an array of strings');
-    }
+
     this.__whitelist = val;
     const attr = val.join(',');
     this.setAttribute(WLATTR, attr);
@@ -173,9 +172,9 @@ export class JsonViewer extends HTMLElement {
       const styles = new CSSStyleSheet();
       styles.replaceSync(css);
       this.shadowRoot.adoptedStyleSheets = [styles];
-    } else {
+    } else
       this.shadowRoot.innerHTML = `<style>${css}</style>`;
-    }
+
     this.shadowRoot.append(template.content.cloneNode(true));
   }
 
@@ -201,7 +200,7 @@ export class JsonViewer extends HTMLElement {
   render() {
     const highlighted = this.getHighlightedDomString();
     this.shadowRoot.querySelector('code').hidden = !highlighted;
-    this.shadowRoot.querySelector('pre').innerHTML = highlighted;
+    this.shadowRoot.querySelector('code').innerHTML = highlighted;
   }
 
   /** @private */
