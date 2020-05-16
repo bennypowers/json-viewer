@@ -3,6 +3,7 @@
   "tags": [
     {
       "name": "json-viewer",
+      "path": "./json-viewer.js",
       "description": "Custom Element that shows a JavaScript object's properties as syntax-highlighted JSON.\n\nThe element will respect `prefers-color-scheme` by default, but if you use the\nCSS Custom Properties listed below, you should customize both light and dark themes.\n\n❤️ Proudly uses [open-wc](https://open-wc.org) tools and recommendations.",
       "attributes": [
         {
