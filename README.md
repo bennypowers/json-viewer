@@ -17,11 +17,13 @@ render(template, document.body);
 
 ```html
 <json-viewer whitelist="foo,bar">
-{
-  "foo": "foo",
-  "bar": "bar",
-  "baz": "baz"
-}
+  <script type="application/json">
+    {
+      "foo": "foo",
+      "bar": "bar",
+      "baz": "baz"
+    }
+  </script>
 </json-viewer>
 ```
 
@@ -37,6 +39,12 @@ render(template, document.body);
 | Name | Description                                      |
 |------|--------------------------------------------------|
 |      | JSON strings appended as text nodes will be parsed and displayed |
+
+## CSS Shadow Parts
+
+| Part   | Description                   |
+|--------|-------------------------------|
+| `code` | the wrapping `<code>` element |
 
 ## CSS Custom Properties
 

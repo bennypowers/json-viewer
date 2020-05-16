@@ -60,6 +60,12 @@
           "name": "--json-viewer-string-color",
           "description": "Color for strings. Light #0c8599, Dark #22b8cf"
         }
+      ],
+      "cssParts": [
+        {
+          "name": "code",
+          "description": "the wrapping `<code>` element"
+        }
       ]
     }
   ]

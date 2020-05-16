@@ -101,11 +101,13 @@ const WLATTR = 'whitelist';
  * @example
  * ```html
  * <json-viewer whitelist="foo,bar">
- * {
- *   "foo": "foo",
- *   "bar": "bar",
- *   "baz": "baz"
- * }
+ *   <script type="application/json">
+ *     {
+ *       "foo": "foo",
+ *       "bar": "bar",
+ *       "baz": "baz"
+ *     }
+ *   </script>
  * </json-viewer>
  * ```
  *
@@ -117,7 +119,7 @@ const WLATTR = 'whitelist';
  * @cssprop --json-viewer-null-color - Color for nulls. Light #e03131, Dark #ff6b6b
  * @cssprop --json-viewer-string-color - Color for strings. Light #0c8599, Dark #22b8cf
  *
- * @part code - the wrapping `<code>` element
+ * @csspart code - the wrapping `<code>` element
  *
  * @slot - JSON strings appended as text nodes will be parsed and displayed
  */
@@ -205,9 +207,13 @@ export class JsonViewer extends HTMLElement {
 
   /** @private */
   parse() {
-    if (!this.textContent.trim()) return;
+    const { textContent } =
+      this.querySelector('script[type="application/json"]') ||
+      this.querySelector('script[type="application/ld+json"]') ||
+      this;
+    if (!textContent.trim()) return;
     try {
-      this.object = JSON.parse(this.textContent);
+      this.object = JSON.parse(textContent);
     } catch (_) {
       this.object = undefined;
     }

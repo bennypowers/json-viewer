@@ -30,14 +30,43 @@ describe('json-viewer', function() {
     it('hides object properties not in whitelist', async function() {
       const object = { one: 1, two: 'two' };
       const element = await fixture(html`<json-viewer whitelist="one" .object="${object}"></json-viewer>`);
-      expect(element).shadowDom.to.equal(`
-      <code part="code">
-        {
-          <mark class="key">"one"</mark>:
-          <mark class="number">1</mark>
-        }
-      </code>
+      expect(element).shadowDom.to.equalSnapshot();
+    });
+  });
+
+  describe('with JSON script child', function() {
+    it('displays object properties', async function() {
+      const object = { one: 1 };
+      const json = JSON.stringify(object, null, 2);
+      const element = await fixture(html`
+        <json-viewer>
+          <script type="application/json">
+            ${json}
+          </script>
+        </json-viewer>
       `);
+      expect(element).shadowDom.to.equalSnapshot();
+    });
+  });
+
+  describe('with JSON-LD script child', function() {
+    it('displays object properties', async function() {
+      const object = {
+        '@context': 'https://json-ld.org/contexts/person.jsonld',
+        '@id': 'http://dbpedia.org/resource/John_Lennon',
+        'name': 'John Lennon',
+        'born': '1940-10-09',
+        'spouse': 'http://dbpedia.org/resource/Cynthia_Lennon',
+      };
+      const json = JSON.stringify(object, null, 2);
+      const element = await fixture(html`
+        <json-viewer>
+          <script type="application/ld+json">
+            ${json}
+          </script>
+        </json-viewer>
+      `);
+      expect(element).shadowDom.to.equalSnapshot();
     });
   });
 
@@ -46,45 +75,32 @@ describe('json-viewer', function() {
       const object = { one: 1 };
       const json = JSON.stringify(object, null, 2);
       const element = await fixture(html`<json-viewer>${json}</json-viewer>`);
-      expect(element).shadowDom.to.equal(`
-      <code part="code">
-        {
-          <mark class="key">"one"</mark>:
-          <mark class="number">1</mark>
-        }
-      </code>
-      `);
+      expect(element).shadowDom.to.equalSnapshot();
     });
 
     it('hides object properties not in whitelist', async function() {
       const object = { one: 1, two: 'two' };
       const json = JSON.stringify(object, null, 2);
-      const element = await fixture(html`<json-viewer whitelist="one">${json}</json-viewer>`);
-      expect(element).shadowDom.to.equal(`
-      <code part="code">
-        {
-          <mark class="key">"one"</mark>:
-          <mark class="number">1</mark>
-        }
-      </code>
+      const element = await fixture(html`
+        <json-viewer whitelist="one">
+          <script type="application/json">
+            ${json}
+          </script>
+        </json-viewer>
       `);
+      expect(element).shadowDom.to.equalSnapshot();
     });
   });
 
   describe('with Element as property of object', function() {
     it('stringifies element', async function() {
-      const object = { one: 1, element: document.createElement('json-viewer') };
-      const element = await fixture(html`<json-viewer .object="${object}"></json-viewer>`);
-      expect(element).shadowDom.to.equal(`
-      <code part="code">
-        {
-          <mark class="key">"one"</mark>:
-          <mark class="number">1</mark>,
-          <mark class="key">"element"</mark>:
-          <mark class="string">&lt;json-viewer&gt;&lt;/json-viewer&gt;""</mark>
-        }
-      </code>
+      const element = await fixture(html`
+        <json-viewer .object="${{
+          one: 1,
+          el: document.createElement('json-viewer'),
+        }}"></json-viewer>
       `);
+      expect(element).shadowDom.to.equalSnapshot();
     });
   });
 
@@ -92,14 +108,7 @@ describe('json-viewer', function() {
     it('strips undefined', async function() {
       const object = { one: 1, undefined: undefined };
       const element = await fixture(html`<json-viewer .object="${object}"></json-viewer>`);
-      expect(element).shadowDom.to.equal(`
-      <code part="code">
-        {
-          <mark class="key">"one"</mark>:
-          <mark class="number">1</mark>
-        }
-      </code>
-      `);
+      expect(element).shadowDom.to.equalSnapshot();
     });
   });
 
@@ -108,30 +117,33 @@ describe('json-viewer', function() {
       const object = { one: 1, two: { three: ['four', 'five'] } };
       const element = await fixture(html`<json-viewer .object="${object}"></json-viewer>`);
       // bug in semantic-dom-diff requires weird spacing on closing `}`
-      expect(element).shadowDom.to.equal(`
-      <code part="code">
-        {
-          <mark class="key">"one"</mark>:
-          <mark class="number">1</mark>,
-          <mark class="key">"two"</mark>: {
-            <mark class="key">"three"</mark>: [
-              <mark class="string">"four"</mark>,
-              <mark class="string">"five"</mark>
-            ]
-  }
-}
-      </code>
+      expect(element).shadowDom.to.equalSnapshot();
+    });
+  });
+
+  describe('with invalid JSON string', function() {
+    it('does not display', async function() {
+      const json = '{one: one}';
+      const element = await fixture(html`
+        <json-viewer>
+          <script type="application/json">
+            ${json}
+          </script>
+        </json-viewer>
       `);
+      expect(element).shadowDom.to.equalSnapshot();
     });
   });
 
   describe('with invalid JSON string as textContent', function() {
     it('does not display', async function() {
       const json = '{one: one}';
-      const element = await fixture(html`<json-viewer>${json}</json-viewer>`);
-      expect(element).shadowDom.to.equal(`
-      <code hidden part="code"></code>
+      const element = await fixture(html`
+        <json-viewer>
+          ${json}
+        </json-viewer>
       `);
+      expect(element).shadowDom.to.equalSnapshot();
     });
   });
 
@@ -152,7 +164,13 @@ describe('json-viewer', function() {
   describe('polyfills', function() {
     it('polyfills adoptedStyleSheets', async function() {
       delete Document.prototype.adoptedStyleSheets;
-      const element = await fixture(html`<json-viewer>{"one":"two"}</json-viewer>`);
+      const element = await fixture(html`
+        <json-viewer>
+          <script type="application/json">
+            {"one":"two"}
+          </script>
+        </json-viewer>
+      `);
       const string = element.shadowRoot.querySelector('.string');
       expect(getComputedStyle(string).getPropertyValue('color')).to.equal('rgb(34, 184, 207)');
     });
@@ -161,28 +179,14 @@ describe('json-viewer', function() {
       delete Object.fromEntries;
       const object = { one: 1, two: 'two' };
       const element = await fixture(html`<json-viewer whitelist="one" .object="${object}"></json-viewer>`);
-      expect(element).shadowDom.to.equal(`
-      <code part="code">
-        {
-          <mark class="key">"one"</mark>:
-          <mark class="number">1</mark>
-        }
-      </code>
-      `);
+      expect(element).shadowDom.to.equalSnapshot();
     });
 
     it('polyfills Array#flatMap', async function() {
       delete Array.prototype.flatMap;
       const object = { one: 1, two: 'two' };
       const element = await fixture(html`<json-viewer whitelist="one" .object="${object}"></json-viewer>`);
-      expect(element).shadowDom.to.equal(`
-      <code part="code">
-        {
-          <mark class="key">"one"</mark>:
-          <mark class="number">1</mark>
-        }
-      </code>
-      `);
+      expect(element).shadowDom.to.equalSnapshot();
     });
   });
 });
