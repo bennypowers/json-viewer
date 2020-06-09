@@ -81,7 +81,7 @@ mark.string { color: var(--json-viewer-string-color); }
 const template = document.createElement('template');
 template.innerHTML = `<code hidden part="code"></code>`;
 
-const WLATTR = 'whitelist';
+const ALATTR = 'allowlist';
 
 /**
  * Custom Element that shows a JavaScript object's properties as syntax-highlighted JSON.
@@ -94,13 +94,13 @@ const WLATTR = 'whitelist';
  * @example
  * ```javascript
  * const properties = {foo: 'foo', bar: 'bar', baz: 'baz'};
- * const template = html`<json-viewer .object="${properties}" whitelist="foo,bar"></json-viewer>`;
+ * const template = html`<json-viewer .object="${properties}" allowlist="foo,bar"></json-viewer>`;
  * render(template, document.body);
  * ```
  *
  * @example
  * ```html
- * <json-viewer whitelist="foo,bar">
+ * <json-viewer allowlist="foo,bar">
  *   <script type="application/json">
  *     {
  *       "foo": "foo",
@@ -129,7 +129,7 @@ export class JsonViewer extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return [WLATTR];
+    return [ALATTR];
   }
 
   /**
@@ -146,22 +146,22 @@ export class JsonViewer extends HTMLElement {
   }
 
   /**
-   * Whitelist of keys for the object.
+   * allowlist of keys for the object.
    * Required if setting `object` to a non-serializable object (e.g. an HTMLElement)
    * @type {string[]}
    * @attr
    */
-  get whitelist() {
-    return this.__whitelist;
+  get allowlist() {
+    return this.__allowlist;
   }
 
-  set whitelist(val) {
+  set allowlist(val) {
     if (!isAllStrings(val))
-      throw new Error('whitelist must be an array of strings');
+      throw new Error('allowlist must be an array of strings');
 
-    this.__whitelist = val;
+    this.__allowlist = val;
     const attr = val.join(',');
-    this.setAttribute(WLATTR, attr);
+    this.setAttribute(ALATTR, attr);
     this.render();
   }
 
@@ -180,8 +180,8 @@ export class JsonViewer extends HTMLElement {
     this.shadowRoot.append(template.content.cloneNode(true));
   }
 
-  attributeChangedCallback(_, __, whitelist) {
-    this.whitelist = whitelist.split(',').map(trim);
+  attributeChangedCallback(_, __, allowlist) {
+    this.allowlist = allowlist.split(',').map(trim);
   }
 
   connectedCallback() {
@@ -193,9 +193,9 @@ export class JsonViewer extends HTMLElement {
    * @return {string} syntax-highlighted HTML string
    */
   getHighlightedDomString() {
-    const { whitelist, object } = this;
+    const { allowlist, object } = this;
     return object === undefined ?
-      '' : json(whitelist ? pick(whitelist, object) : object);
+      '' : json(allowlist ? pick(allowlist, object) : object);
   }
 
   /** @private */

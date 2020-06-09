@@ -11,12 +11,12 @@ CSS Custom Properties listed below, you should customize both light and dark the
 
 ```javascript
 const properties = {foo: 'foo', bar: 'bar', baz: 'baz'};
-const template = html`<json-viewer .object="${properties}" whitelist="foo,bar"></json-viewer>`;
+const template = html`<json-viewer .object="${properties}" allowlist="foo,bar"></json-viewer>`;
 render(template, document.body);
 ```
 
 ```html
-<json-viewer whitelist="foo,bar">
+<json-viewer allowlist="foo,bar">
   <script type="application/json">
     {
       "foo": "foo",
@@ -31,8 +31,8 @@ render(template, document.body);
 
 | Property    | Attribute   | Type       | Description                                      |
 |-------------|-------------|------------|--------------------------------------------------|
+| `allowlist` | `allowlist` | `string[]` | allowlist of keys for the object.<br />Required if setting `object` to a non-serializable object (e.g. an HTMLElement) |
 | `object`    |             | `object`   | Object to display                                |
-| `whitelist` | `whitelist` | `string[]` | Whitelist of keys for the object.<br />Required if setting `object` to a non-serializable object (e.g. an HTMLElement) |
 
 ## Slots
 

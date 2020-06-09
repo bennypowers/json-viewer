@@ -2,7 +2,7 @@
 
 ## `with object property set`
 
-####   `hides object properties not in whitelist`
+####   `hides object properties not in allowlist`
 
 ```html
 <code part="code">
@@ -108,7 +108,7 @@
 
 ```
 
-####   `hides object properties not in whitelist`
+####   `hides object properties not in allowlist`
 
 ```html
 <code part="code">

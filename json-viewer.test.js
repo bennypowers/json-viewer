@@ -27,9 +27,9 @@ describe('json-viewer', function() {
       `);
     });
 
-    it('hides object properties not in whitelist', async function() {
+    it('hides object properties not in allowlist', async function() {
       const object = { one: 1, two: 'two' };
-      const element = await fixture(html`<json-viewer whitelist="one" .object="${object}"></json-viewer>`);
+      const element = await fixture(html`<json-viewer allowlist="one" .object="${object}"></json-viewer>`);
       expect(element).shadowDom.to.equalSnapshot();
     });
   });
@@ -78,11 +78,11 @@ describe('json-viewer', function() {
       expect(element).shadowDom.to.equalSnapshot();
     });
 
-    it('hides object properties not in whitelist', async function() {
+    it('hides object properties not in allowlist', async function() {
       const object = { one: 1, two: 'two' };
       const json = JSON.stringify(object, null, 2);
       const element = await fixture(html`
-        <json-viewer whitelist="one">
+        <json-viewer allowlist="one">
           <script type="application/json">
             ${json}
           </script>
@@ -147,17 +147,17 @@ describe('json-viewer', function() {
     });
   });
 
-  describe('with comma-separated whitelist attr', function() {
-    it('sets whitelist property', async function() {
-      const element = await fixture(html`<json-viewer whitelist="one, two,baz"></json-viewer>`);
-      expect(element.whitelist).to.deep.equal(['one', 'two', 'baz']);
+  describe('with comma-separated allowlist attr', function() {
+    it('sets allowlist property', async function() {
+      const element = await fixture(html`<json-viewer allowlist="one, two,baz"></json-viewer>`);
+      expect(element.allowlist).to.deep.equal(['one', 'two', 'baz']);
     });
   });
 
-  describe('when setting invalid whitelist property', function() {
-    it('sets whitelist property', async function() {
+  describe('when setting invalid allowlist property', function() {
+    it('sets allowlist property', async function() {
       const element = await fixture(html`<json-viewer></json-viewer>`);
-      expect(() => element.whitelist = 'one').to.throw('whitelist must be an array of strings');
+      expect(() => element.allowlist = 'one').to.throw('allowlist must be an array of strings');
     });
   });
 
@@ -178,14 +178,14 @@ describe('json-viewer', function() {
     it('polyfills Object.fromEntries', async function() {
       delete Object.fromEntries;
       const object = { one: 1, two: 'two' };
-      const element = await fixture(html`<json-viewer whitelist="one" .object="${object}"></json-viewer>`);
+      const element = await fixture(html`<json-viewer allowlist="one" .object="${object}"></json-viewer>`);
       expect(element).shadowDom.to.equalSnapshot();
     });
 
     it('polyfills Array#flatMap', async function() {
       delete Array.prototype.flatMap;
       const object = { one: 1, two: 'two' };
-      const element = await fixture(html`<json-viewer whitelist="one" .object="${object}"></json-viewer>`);
+      const element = await fixture(html`<json-viewer allowlist="one" .object="${object}"></json-viewer>`);
       expect(element).shadowDom.to.equalSnapshot();
     });
   });
