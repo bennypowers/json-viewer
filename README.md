@@ -29,7 +29,7 @@ render(template, document.body);
 </json-viewer>
 ```
 
-![Example Render](example-render.png)
+![Example Render](example.png)
 
 ## Properties
 
