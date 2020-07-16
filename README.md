@@ -7,8 +7,6 @@ CSS Custom Properties listed below, you should customize both light and dark the
 
 ❤️ Proudly uses [open-wc](https://open-wc.org) tools and recommendations.
 
-![Example Render](example-render.png)
-
 ## Examples
 
 ```javascript
@@ -28,6 +26,8 @@ render(template, document.body);
   </script>
 </json-viewer>
 ```
+
+![Example Render](example-render.png)
 
 ## Properties
 
