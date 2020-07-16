@@ -16,12 +16,14 @@ render(template, document.body);
 ```
 
 ```html
-<json-viewer allowlist="foo,bar">
+<json-viewer allowlist="meenie,minie">
   <script type="application/json">
     {
-      "foo": "foo",
-      "bar": "bar",
-      "baz": "baz"
+      "eenie": 1,
+      "meenie": true,
+      "minie": [{
+        "mo": "catch a tiger by the toe"
+      }]
     }
   </script>
 </json-viewer>
