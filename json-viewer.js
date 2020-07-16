@@ -39,8 +39,7 @@ const flatMap =
 
 const pick =
   (keys, element) =>
-      !Array.isArray(keys) ? element
-    : keys.reduce((pojo, key) =>
+    keys.reduce((pojo, key) =>
       Object.assign(pojo, { [key]: element[key] }), {});
 
 const stripUndefinedVals =
@@ -218,7 +217,7 @@ export class JsonViewer extends HTMLElement {
     const previous = this.allowlist || [];
     const next = newVal || '';
     if (previous.join(',') === next) return;
-    this.allowlist = next.split(',').map(trim);
+    this.allowlist = next.split(',').map(trim).filter(Boolean);
   }
 
   connectedCallback() {
@@ -231,8 +230,10 @@ export class JsonViewer extends HTMLElement {
    */
   getHighlightedDomString() {
     const { allowlist, object } = this;
-    return object === undefined ?
-      '' : json(allowlist ? pick(allowlist, object) : object);
+    if (object === undefined) return '';
+    const hasAllowList = Array.isArray(allowlist) && allowlist.length;
+    const objectToRender = hasAllowList ? pick(allowlist, object) : object;
+    return json(objectToRender);
   }
 
   /** @private */
