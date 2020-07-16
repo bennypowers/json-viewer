@@ -39,7 +39,8 @@ const flatMap =
 
 const pick =
   (keys, element) =>
-    keys.reduce((pojo, key) =>
+      !Array.isArray(keys) ? element
+    : keys.reduce((pojo, key) =>
       Object.assign(pojo, { [key]: element[key] }), {});
 
 const stripUndefinedVals =
@@ -89,7 +90,7 @@ mark { background: none; }
 
 @media (prefers-color-scheme: dark), (prefers-color-scheme: no-preference) {
   :host { background: var(--json-viewer-background, #212529); }
-  .key { color: var(--json-viewer-key-color, white); }
+  .key { color: var(--json-viewer-key-color, #ff922b); }
   .boolean { color: var(--json-viewer-boolean-color, #22b8cf); }
   .number { color: var(--json-viewer-number-color, #51cf66); }
   .null { color: var(--json-viewer-null-color, #ff6b6b); }
@@ -122,9 +123,6 @@ const ALATTR = 'allowlist';
  *
  * ❤️ Proudly uses [open-wc](https://open-wc.org) tools and recommendations.
  *
- * ![Example Markup](example-markup.png)
- * ![Example Render](example-render.png)
- *
  * @example
  * ```javascript
  * const properties = {foo: 'foo', bar: 'bar', baz: 'baz'};
@@ -134,16 +132,18 @@ const ALATTR = 'allowlist';
  *
  * @example
  * ```html
- * <json-viewer allowlist="foo,bar">
+ * <json-viewer allowlist="meenie,minie">
  *   <script type="application/json">
  *     {
- *       "foo": "foo",
- *       "bar": "bar",
- *       "baz": "baz"
+ *       "eenie": 1,
+ *       "meenie": true,
+ *       "minie": [{ "mo": "catch a tiger by the toe" }]
  *     }
  *   </script>
  * </json-viewer>
  * ```
+ *
+ * ![Example Markup](example.png)
  *
  * @cssprop --json-viewer-color - Color for generic text. Light white, Dark #212121
  * @cssprop --json-viewer-background - Color for generic text. Light #212121, Dark white
@@ -214,8 +214,11 @@ export class JsonViewer extends HTMLElement {
     this.shadowRoot.append(template.content.cloneNode(true));
   }
 
-  attributeChangedCallback(_, __, allowlist) {
-    this.allowlist = allowlist.split(',').map(trim);
+  attributeChangedCallback(_, __, newVal) {
+    const previous = this.allowlist || [];
+    const next = newVal || '';
+    if (previous.join(',') === next) return;
+    this.allowlist = next.split(',').map(trim);
   }
 
   connectedCallback() {
