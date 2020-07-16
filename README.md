@@ -7,6 +7,8 @@ CSS Custom Properties listed below, you should customize both light and dark the
 
 ❤️ Proudly uses [open-wc](https://open-wc.org) tools and recommendations.
 
+![Example Render](example-render.png)
+
 ## Examples
 
 ```javascript
@@ -29,10 +31,10 @@ render(template, document.body);
 
 ## Properties
 
-| Property    | Attribute   | Type       | Description                                      |
-|-------------|-------------|------------|--------------------------------------------------|
-| `allowlist` | `allowlist` | `string[]` | allowlist of keys for the object.<br />Required if setting `object` to a non-serializable object (e.g. an HTMLElement) |
-| `object`    |             | `object`   | Object to display                                |
+| Property    | Attribute   | Type               | Description                                      |
+|-------------|-------------|--------------------|--------------------------------------------------|
+| `allowlist` | `allowlist` | `string\|string[]` | allowlist of keys for the object.<br />Required if setting `object` to a non-serializable object (e.g. an HTMLElement) |
+| `object`    |             | `object`           | Object to display                                |
 
 ## Slots
 

@@ -30,7 +30,19 @@ describe('json-viewer', function() {
     it('hides object properties not in allowlist', async function() {
       const object = { one: 1, two: 'two' };
       const element = await fixture(html`<json-viewer allowlist="one" .object="${object}"></json-viewer>`);
-      expect(element).shadowDom.to.equalSnapshot();
+      expect(element).shadowDom.to.equal(`
+        <code part="code">
+          {
+          <mark class="key">
+            "one"
+          </mark>
+          :
+          <mark class="number">
+            1
+          </mark>
+          }
+        </code>
+      `);
     });
   });
 
@@ -45,7 +57,19 @@ describe('json-viewer', function() {
           </script>
         </json-viewer>
       `);
-      expect(element).shadowDom.to.equalSnapshot();
+      expect(element).shadowDom.to.equal(`
+        <code part="code">
+          {
+          <mark class="key">
+            "one"
+          </mark>
+          :
+          <mark class="number">
+            1
+          </mark>
+          }
+        </code>
+      `);
     });
   });
 
@@ -66,7 +90,51 @@ describe('json-viewer', function() {
           </script>
         </json-viewer>
       `);
-      expect(element).shadowDom.to.equalSnapshot();
+      expect(element).shadowDom.to.equal(`
+        <code part="code">
+          {
+          <mark class="key">
+            "@context"
+          </mark>
+          :
+          <mark class="string">
+            "https://json-ld.org/contexts/person.jsonld"
+          </mark>
+          ,
+          <mark class="key">
+            "@id"
+          </mark>
+          :
+          <mark class="string">
+            "http://dbpedia.org/resource/John_Lennon"
+          </mark>
+          ,
+          <mark class="key">
+            "name"
+          </mark>
+          :
+          <mark class="string">
+            "John Lennon"
+          </mark>
+          ,
+          <mark class="key">
+            "born"
+          </mark>
+          :
+          <mark class="string">
+            "1940-10-09"
+          </mark>
+          ,
+          <mark class="key">
+            "spouse"
+          </mark>
+          :
+          <mark class="string">
+            "http://dbpedia.org/resource/Cynthia_Lennon"
+          </mark>
+          }
+        </code>
+      `);
     });
   });
 
@@ -75,7 +143,20 @@ describe('json-viewer', function() {
       const object = { one: 1 };
       const json = JSON.stringify(object, null, 2);
       const element = await fixture(html`<json-viewer>${json}</json-viewer>`);
-      expect(element).shadowDom.to.equalSnapshot();
+      expect(element).shadowDom.to.equal(`
+        <code part="code">
+          {
+          <mark class="key">
+            "one"
+          </mark>
+          :
+          <mark class="number">
+            1
+          </mark>
+          }
+        </code>
+
+      `);
     });
 
     it('hides object properties not in allowlist', async function() {
@@ -88,7 +169,19 @@ describe('json-viewer', function() {
           </script>
         </json-viewer>
       `);
-      expect(element).shadowDom.to.equalSnapshot();
+      expect(element).shadowDom.to.equal(`
+        <code part="code">
+          {
+          <mark class="key">
+            "one"
+          </mark>
+          :
+          <mark class="number">
+            1
+          </mark>
+          }
+        </code>
+      `);
     });
   });
 
@@ -100,7 +193,25 @@ describe('json-viewer', function() {
           el: document.createElement('json-viewer'),
         }}"></json-viewer>
       `);
-      expect(element).shadowDom.to.equalSnapshot();
+      expect(element).shadowDom.to.equal(`
+        <code part="code">
+          {
+          <mark class="key">
+            "one"
+          </mark>
+          :
+          <mark class="number">
+            1
+          </mark>
+          ,
+          <mark class="key">
+            "el"
+          </mark>
+          :
+          <mark class="string">&lt;json-viewer&gt;&lt;/json-viewer&gt;""</mark>
+          }
+        </code>
+      `);
     });
   });
 
@@ -108,7 +219,19 @@ describe('json-viewer', function() {
     it('strips undefined', async function() {
       const object = { one: 1, undefined: undefined };
       const element = await fixture(html`<json-viewer .object="${object}"></json-viewer>`);
-      expect(element).shadowDom.to.equalSnapshot();
+      expect(element).shadowDom.to.equal(`
+        <code part="code">
+          {
+          <mark class="key">
+            "one"
+          </mark>
+          :
+          <mark class="number">
+            1
+          </mark>
+          }
+        </code>
+      `);
     });
   });
 
@@ -117,7 +240,37 @@ describe('json-viewer', function() {
       const object = { one: 1, two: { three: ['four', 'five'] } };
       const element = await fixture(html`<json-viewer .object="${object}"></json-viewer>`);
       // bug in semantic-dom-diff requires weird spacing on closing `}`
-      expect(element).shadowDom.to.equalSnapshot();
+      expect(element).shadowDom.to.equal(`
+        <code part="code">
+          {
+          <mark class="key">
+            "one"
+          </mark>
+          :
+          <mark class="number">
+            1
+          </mark>
+          ,
+          <mark class="key">
+            "two"
+          </mark>
+          : {
+          <mark class="key">
+            "three"
+          </mark>
+          : [
+          <mark class="string">
+            "four"
+          </mark>
+          ,
+          <mark class="string">
+            "five"
+          </mark>
+          ]
+  }
+}
+        </code>
+      `);
     });
   });
 
@@ -131,7 +284,9 @@ describe('json-viewer', function() {
           </script>
         </json-viewer>
       `);
-      expect(element).shadowDom.to.equalSnapshot();
+      expect(element).shadowDom.to.equal(`
+        <code hidden part="code"></code>
+      `);
     });
   });
 
@@ -143,7 +298,9 @@ describe('json-viewer', function() {
           ${json}
         </json-viewer>
       `);
-      expect(element).shadowDom.to.equalSnapshot();
+      expect(element).shadowDom.to.equal(`
+        <code hidden part="code"></code>
+      `);
     });
   });
 
@@ -178,15 +335,43 @@ describe('json-viewer', function() {
     it('polyfills Object.fromEntries', async function() {
       delete Object.fromEntries;
       const object = { one: 1, two: 'two' };
-      const element = await fixture(html`<json-viewer allowlist="one" .object="${object}"></json-viewer>`);
-      expect(element).shadowDom.to.equalSnapshot();
+      const element = await fixture(html`
+        <json-viewer allowlist="one" .object="${object}"></json-viewer>
+      `);
+      expect(element).shadowDom.to.equal(`
+        <code part="code">
+          {
+          <mark class="key">
+            "one"
+          </mark>
+          :
+          <mark class="number">
+            1
+          </mark>
+          }
+        </code>
+      `);
     });
 
     it('polyfills Array#flatMap', async function() {
       delete Array.prototype.flatMap;
       const object = { one: 1, two: 'two' };
-      const element = await fixture(html`<json-viewer allowlist="one" .object="${object}"></json-viewer>`);
-      expect(element).shadowDom.to.equalSnapshot();
+      const element = await fixture(html`
+        <json-viewer allowlist="one" .object="${object}"></json-viewer>
+      `);
+      expect(element).shadowDom.to.equal(`
+        <code part="code">
+          {
+          <mark class="key">
+            "one"
+          </mark>
+          :
+          <mark class="number">
+            1
+          </mark>
+          }
+        </code>
+      `);
     });
   });
 });

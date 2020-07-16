@@ -1,38 +1,78 @@
-const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)));
-const isString = x => typeof x === 'string';
-const trim = s => s.trim();
-const isObject = x => x !== null && `${x}` === '[object Object]';
-const replace = (...args) => s => s.replace(...args);
-const isAllStrings = xs => Array.isArray(xs) && xs.every(isString);
-const fromEntries = xs => Object.fromEntries ? Object.fromEntries(xs)
-  : xs.reduce((o, [k, v]) => ({ [k]: v, ...o }), {});
-const flatMap = f => xs =>
+const compose =
+  (...fns) =>
+    fns.reduce((f, g) =>
+      (...args) =>
+        f(g(...args)));
+
+const isString =
+  x =>
+    typeof x === 'string';
+
+const trim =
+  s =>
+    s.trim();
+
+const isObject =
+  x =>
+    x !== null &&
+    `${x}` === '[object Object]';
+
+const replace =
+  (...args) => s =>
+    s.replace(...args);
+
+const isAllStrings =
+  xs =>
+    Array.isArray(xs) &&
+    xs.every(isString);
+
+const fromEntries =
+  xs =>
+      Object.fromEntries ? Object.fromEntries(xs)
+    : xs.reduce((o, [k, v]) => ({ [k]: v, ...o }), {});
+
+const flatMap =
+  f => xs =>
   'flatMap' in Array.prototype ?
     xs.flatMap(f)
     : xs.reduce((acc, x) => acc.concat(f(x)), []);
 
-const pick = (keys, element) =>
-  keys.reduce((pojo, key) =>
-    Object.assign(pojo, { [key]: element[key] }), {});
+const pick =
+  (keys, element) =>
+    keys.reduce((pojo, key) =>
+      Object.assign(pojo, { [key]: element[key] }), {});
 
-const stripUndefinedVals = flatMap(([k, v]) => v === undefined ? [] : [[k, v]]);
-const stripUndefined = compose(fromEntries, stripUndefinedVals, Object.entries);
+const stripUndefinedVals =
+  flatMap(([k, v]) => v === undefined ? [] : [[k, v]]);
+
+const stripUndefined =
+  compose(fromEntries, stripUndefinedVals, Object.entries);
 
 const mark = x =>
     x instanceof Element ? `<mark class='string'>${x.outerHTML.replace(/</g, '&lt;').replace(/"/g, '\'')}</mark>`
   : isObject(x) || Array.isArray(x) ? x
   : `<mark class='${x === null ? 'null' : typeof x}'>${x}</mark>`;
 
-const replacer = (k, v) => k === '' ? v : mark(v);
-const pretty = o => JSON.stringify(o, replacer, 2);
+const replacer =
+  (k, v) =>
+    k === '' ? v : mark(v);
 
-const markKeys = replace(/"(.*)":/g, (_, key) => `<mark class="key">"${key}"</mark>:`);
-const wrapStrings = replace(/"<mark(.*)>(.*)<\/mark>"/g, (_, attrs, content) =>
-  `<mark${attrs}>${attrs.includes('string') ? `"${content}"` : content}</mark>`);
+const pretty =
+  o =>
+    JSON.stringify(o, replacer, 2);
 
-const json = compose(wrapStrings, markKeys, pretty, stripUndefined);
+const markKeys =
+  replace(/"(.*)":/g, (_, key) =>
+    `<mark class="key">"${key}"</mark>:`);
 
-const css = `
+const wrapStrings =
+  replace(/"<mark(.*)>(.*)<\/mark>"/g, (_, attrs, content) =>
+    `<mark${attrs}>${attrs.includes('string') ? `"${content}"` : content}</mark>`);
+
+const json =
+  compose(wrapStrings, markKeys, pretty, stripUndefined);
+
+const css = /* css */`
 [hidden],
 :host([hidden]) {
   display: none !important;
@@ -42,44 +82,35 @@ const css = `
   display: block;
   position: relative;
   color: var(--json-viewer-color, currentColor);
-  background: var(--json-viewer-background);
 }
 
 code { white-space: pre; }
 mark { background: none; }
-mark.key { color: var(--json-viewer-key-color); }
-mark.boolean { color: var(--json-viewer-boolean-color); }
-mark.number { color: var(--json-viewer-number-color); }
-mark.null { color: var(--json-viewer-null-color); }
-mark.string { color: var(--json-viewer-string-color); }
 
 @media (prefers-color-scheme: dark), (prefers-color-scheme: no-preference) {
-  :host {
-    --json-viewer-color: white;
-    --json-viewer-background: #212529;
-    --json-viewer-key-color: #ff922b;
-    --json-viewer-boolean-color: #22b8cf;
-    --json-viewer-number-color: #51cf66;
-    --json-viewer-null-color: #ff6b6b;
-    --json-viewer-string-color: #22b8cf;
-  }
+  :host { background: var(--json-viewer-background, #212529); }
+  .key { color: var(--json-viewer-key-color, white); }
+  .boolean { color: var(--json-viewer-boolean-color, #22b8cf); }
+  .number { color: var(--json-viewer-number-color, #51cf66); }
+  .null { color: var(--json-viewer-null-color, #ff6b6b); }
+  .string { color: var(--json-viewer-string-color, #22b8cf); }
 }
 
 @media (prefers-color-scheme: light) {
-  :host {
-    --json-viewer-color: #212529;
-    --json-viewer-background: white;
-    --json-viewer-key-color: #f76707;
-    --json-viewer-boolean-color: #0c8599;
-    --json-viewer-number-color: #0ca678;
-    --json-viewer-null-color: #e03131;
-    --json-viewer-string-color: #0c8599;
-  }
+  :host { background: var(--json-viewer-background, white); }
+  .key { color: var(--json-viewer-key-color, #f76707); }
+  .boolean { color: var(--json-viewer-boolean-color, #0c8599); }
+  .number { color: var(--json-viewer-number-color, #0ca678); }
+  .null { color: var(--json-viewer-null-color, #e03131); }
+  .string { color: var(--json-viewer-string-color, #0c8599); }
 }
 `;
 
-const template = document.createElement('template');
-template.innerHTML = `<code hidden part="code"></code>`;
+const template =
+  document.createElement('template');
+
+template.innerHTML =
+  `<code hidden part="code"></code>`;
 
 const ALATTR = 'allowlist';
 
@@ -90,6 +121,9 @@ const ALATTR = 'allowlist';
  * CSS Custom Properties listed below, you should customize both light and dark themes.
  *
  * ❤️ Proudly uses [open-wc](https://open-wc.org) tools and recommendations.
+ *
+ * ![Example Markup](example-markup.png)
+ * ![Example Render](example-render.png)
  *
  * @example
  * ```javascript
@@ -148,7 +182,7 @@ export class JsonViewer extends HTMLElement {
   /**
    * allowlist of keys for the object.
    * Required if setting `object` to a non-serializable object (e.g. an HTMLElement)
-   * @type {string[]}
+   * @type {string|string[]}
    * @attr
    */
   get allowlist() {
@@ -168,7 +202,7 @@ export class JsonViewer extends HTMLElement {
   constructor() {
     super();
     this.__mo = new MutationObserver(this.parse.bind(this));
-    this.__mo.observe(this, { subtree: false, characterData: true });
+    this.__mo.observe(this, { subtree: true, characterData: true });
     this.attachShadow({ mode: 'open' });
     if ('adoptedStyleSheets' in Document.prototype) {
       const styles = new CSSStyleSheet();
@@ -207,10 +241,11 @@ export class JsonViewer extends HTMLElement {
 
   /** @private */
   parse() {
-    const { textContent } =
-      this.querySelector('script[type="application/json"]') ||
-      this.querySelector('script[type="application/ld+json"]') ||
-      this;
+    const parent =
+       this.querySelector('script[type="application/json"]') ||
+       this.querySelector('script[type="application/ld+json"]') ||
+       this;
+    const { textContent = '' } = parent;
     if (!textContent.trim()) return;
     try {
       this.object = JSON.parse(textContent);
