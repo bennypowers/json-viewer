@@ -1,6 +1,6 @@
 {
   "name": "@power-elements/json-viewer",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Custom Element that shows a JavaScript object's properties as syntax-highlighted JSON.",
   "main": "json-viewer.js",
   "module": "json-viewer.js",
