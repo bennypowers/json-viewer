@@ -49,9 +49,9 @@ const stripUndefined =
   compose(fromEntries, stripUndefinedVals, Object.entries);
 
 const mark = x =>
-    x instanceof Element ? `<mark class='string'>${x.outerHTML.replace(/</g, '&lt;').replace(/"/g, '\'')}</mark>`
+    x instanceof Element ? `<mark part='string'>${x.outerHTML.replace(/</g, '&lt;').replace(/"/g, '\'')}</mark>`
   : isObject(x) || Array.isArray(x) ? x
-  : `<mark class='${x === null ? 'null' : typeof x}'>${x}</mark>`;
+  : `<mark part='${x === null ? 'null' : typeof x}'>${x}</mark>`;
 
 const replacer =
   (k, v) =>
@@ -63,7 +63,7 @@ const pretty =
 
 const markKeys =
   replace(/"(.*)":/g, (_, key) =>
-    `<mark class="key">"${key}"</mark>:`);
+    `<mark part="key">"${key}"</mark>:`);
 
 const wrapStrings =
   replace(/"<mark(.*)>(.*)<\/mark>"/g, (_, attrs, content) =>
@@ -71,6 +71,13 @@ const wrapStrings =
 
 const json =
   compose(wrapStrings, markKeys, pretty, stripUndefined);
+
+const toStringList =
+  string =>
+    (string || '')
+      .split(',')
+      .map(trim)
+      .filter(Boolean);
 
 const css = /* css */`
 [hidden],
@@ -89,20 +96,20 @@ mark { background: none; }
 
 @media (prefers-color-scheme: dark), (prefers-color-scheme: no-preference) {
   :host { background: var(--json-viewer-background, #212529); }
-  .key { color: var(--json-viewer-key-color, #ff922b); }
-  .boolean { color: var(--json-viewer-boolean-color, #22b8cf); }
-  .number { color: var(--json-viewer-number-color, #51cf66); }
-  .null { color: var(--json-viewer-null-color, #ff6b6b); }
-  .string { color: var(--json-viewer-string-color, #22b8cf); }
+  [part="key"] { color: var(--json-viewer-key-color, #ff922b); }
+  [part="boolean"] { color: var(--json-viewer-boolean-color, #22b8cf); }
+  [part="number"] { color: var(--json-viewer-number-color, #51cf66); }
+  [part="null"] { color: var(--json-viewer-null-color, #ff6b6b); }
+  [part="string"] { color: var(--json-viewer-string-color, #22b8cf); }
 }
 
 @media (prefers-color-scheme: light) {
   :host { background: var(--json-viewer-background, white); }
-  .key { color: var(--json-viewer-key-color, #f76707); }
-  .boolean { color: var(--json-viewer-boolean-color, #0c8599); }
-  .number { color: var(--json-viewer-number-color, #0ca678); }
-  .null { color: var(--json-viewer-null-color, #e03131); }
-  .string { color: var(--json-viewer-string-color, #0c8599); }
+  [part="key"] { color: var(--json-viewer-key-color, #f76707); }
+  [part="boolean"] { color: var(--json-viewer-boolean-color, #0c8599); }
+  [part="number"] { color: var(--json-viewer-number-color, #0ca678); }
+  [part="null"] { color: var(--json-viewer-null-color, #e03131); }
+  [part="string"] { color: var(--json-viewer-string-color, #0c8599); }
 }
 `;
 
@@ -112,7 +119,8 @@ const template =
 template.innerHTML =
   `<code hidden part="code"></code>`;
 
-const ALATTR = 'allowlist';
+const AL_ATTR = 'allowlist';
+const OBJECT_ATTR = 'object';
 
 /**
  * Custom Element that shows a JavaScript object's properties as syntax-highlighted JSON.
@@ -124,13 +132,21 @@ const ALATTR = 'allowlist';
  *
  * @example
  * ```javascript
- * const properties = {foo: 'foo', bar: 'bar', baz: 'baz'};
- * const template = html`<json-viewer .object="${properties}" allowlist="foo,bar"></json-viewer>`;
- * render(template, document.body);
+ * import '/path/to/json-viewer.js';
+
+ * const viewer = document.createElement('json-viewer');
+ *       viewer.allowlist = ['foo', 'bar'];
+ *       viewer.object = {
+ *         foo: 'foo',
+ *         bar: 'bar',
+ *         baz: 'baz',
+ *       };
  * ```
  *
  * @example
  * ```html
+ * <script type="module" src="/path/to/json-viewer.js"></script>
+ *
  * <json-viewer allowlist="meenie,minie">
  *   <script type="application/json">
  *     {
@@ -154,7 +170,15 @@ const ALATTR = 'allowlist';
  *
  * @csspart code - the wrapping `<code>` element
  *
- * @slot - JSON strings appended as text nodes will be parsed and displayed
+ * @csspart key - property keys
+ * @csspart boolean - boolean property values
+ * @csspart number - number property values
+ * @csspart null - null property values
+ * @csspart string - string property values
+ *
+ * @fires json-parse-error when JSON parse fails
+ *
+ * @slot - JSON scripts or JSON strings appended as text nodes will be parsed and displayed
  */
 export class JsonViewer extends HTMLElement {
   static get is() {
@@ -162,26 +186,35 @@ export class JsonViewer extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return [ALATTR];
+    return [AL_ATTR, OBJECT_ATTR];
   }
 
   /**
-   * Object to display
-   * @type {object}
+   * JavaScript Object to display
+   * Setting this property will override `<script type="application/json">` children
+   *
+   * @type {string|object}
+   * @attr
    */
   get object() {
     return this.__object;
   }
 
   set object(val) {
+    if (val && typeof val === 'string')
+      val = this.tryParse(val);
     this.__object = val;
     this.render();
   }
 
   /**
-   * allowlist of keys for the object.
-   * Required if setting `object` to a non-serializable object (e.g. an HTMLElement)
-   * @type {string|string[]}
+   * User-defined allowlist of top-level keys for the object.
+   * Optional for plain objects,
+   * Required when setting `object` to a non-serializable object (e.g. an HTMLElement)
+   * Property is an Array of strings
+   * Attribute is a comma-separated string
+   *
+   * @type {string[]}
    * @attr
    */
   get allowlist() {
@@ -194,18 +227,38 @@ export class JsonViewer extends HTMLElement {
 
     this.__allowlist = val;
     const attr = val.join(',');
-    this.setAttribute(ALATTR, attr);
+    if (attr)
+      this.setAttribute(AL_ATTR, attr);
     this.render();
+  }
+
+  /**
+   * JSON.parse error
+   *
+   * @type {Error}
+   */
+  get error() {
+    return this.__error;
+  }
+
+  set error(error) {
+    this.__error = error;
+    if (error instanceof Error)
+      this.dispatchEvent(new CustomEvent('json-parse-error'));
   }
 
   constructor() {
     super();
+    this.__error = null;
+    this.__allowlist = [];
     this.__mo = new MutationObserver(this.parse.bind(this));
-    this.__mo.observe(this, { subtree: true, characterData: true });
+    this.__mo.observe(this, { subtree: true, characterData: true, childList: true });
     this.attachShadow({ mode: 'open' });
     if ('adoptedStyleSheets' in Document.prototype) {
       const styles = new CSSStyleSheet();
+      // @ts-expect-error
       styles.replaceSync(css);
+      // @ts-expect-error
       this.shadowRoot.adoptedStyleSheets = [styles];
     } else
       this.shadowRoot.innerHTML = `<style>${css}</style>`;
@@ -213,15 +266,47 @@ export class JsonViewer extends HTMLElement {
     this.shadowRoot.append(template.content.cloneNode(true));
   }
 
-  attributeChangedCallback(_, __, newVal) {
-    const previous = this.allowlist || [];
-    const next = newVal || '';
-    if (previous.join(',') === next) return;
-    this.allowlist = next.split(',').map(trim).filter(Boolean);
-  }
-
+  /** @private */
   connectedCallback() {
     this.parse();
+    if (this.object && this.shadowRoot.querySelector('code').hidden)
+      this.render();
+  }
+
+  /**
+   * @private
+   * @param {string} name
+   * @param {string} oldVal
+   * @param {string} newVal
+   * @return {void}
+   */
+  attributeChangedCallback(name, oldVal, newVal) {
+    switch (name) {
+      case AL_ATTR: return this.allowlistAttrChanged(newVal, oldVal);
+      case OBJECT_ATTR: return this.objectAttrChanged(newVal, oldVal);
+    }
+  }
+
+  /**
+   * @private
+   * @param {string} allowlist new value of allowlist.
+   * @param {string} [oldVal] previous value of allowlist.
+   */
+  allowlistAttrChanged(allowlist, oldVal) {
+    const previous = this.allowlist;
+    const next = allowlist;
+    if (previous.join(',') === next) return;
+    this.allowlist = toStringList(next);
+  }
+
+  /**
+   * @private
+   * @param {string} objectAttr
+   * @param {string} oldVal
+   */
+  objectAttrChanged(objectAttr, oldVal) {
+    if (objectAttr !== oldVal)
+      this.object = this.tryParse(objectAttr);
   }
 
   /**
@@ -246,16 +331,29 @@ export class JsonViewer extends HTMLElement {
   /** @private */
   parse() {
     const parent =
-       this.querySelector('script[type="application/json"]') ||
-       this.querySelector('script[type="application/ld+json"]') ||
-       this;
+      this.querySelector('script[type="application/json"]') ||
+      this.querySelector('script[type="application/ld+json"]') ||
+      this;
     const { textContent = '' } = parent;
     if (!textContent.trim()) return;
+    this.object = this.tryParse(textContent);
+  }
+
+  /**
+   * @private
+   * @param {string} string string to parse
+   * @return {object}
+   */
+  tryParse(string) {
+    let object;
     try {
-      this.object = JSON.parse(textContent);
-    } catch (_) {
-      this.object = undefined;
+      object = JSON.parse(string);
+    } catch (error) {
+      const { name, message } = error;
+      object = { name, message, string };
+      this.error = error;
     }
+    return object;
   }
 }
 

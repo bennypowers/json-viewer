@@ -4,31 +4,48 @@
     {
       "name": "json-viewer",
       "path": "./json-viewer.js",
-      "description": "Custom Element that shows a JavaScript object's properties as syntax-highlighted JSON.\n\nThe element will respect `prefers-color-scheme` by default, but if you use the\nCSS Custom Properties listed below, you should customize both light and dark themes.\n\n❤️ Proudly uses [open-wc](https://open-wc.org) tools and recommendations.\n\n![Example Markup](example-markup.png)\n![Example Render](example-render.png)",
+      "description": "Custom Element that shows a JavaScript object's properties as syntax-highlighted JSON.\n\nThe element will respect `prefers-color-scheme` by default, but if you use the\nCSS Custom Properties listed below, you should customize both light and dark themes.\n\n❤️ Proudly uses [open-wc](https://open-wc.org) tools and recommendations.",
       "attributes": [
         {
+          "name": "object",
+          "description": "JavaScript Object to display\nSetting this property will override `<script type=\"application/json\">` children",
+          "type": "string|object"
+        },
+        {
           "name": "allowlist",
-          "description": "allowlist of keys for the object.\nRequired if setting `object` to a non-serializable object (e.g. an HTMLElement)",
-          "type": "string|string[]"
+          "description": "User-defined allowlist of top-level keys for the object.\nOptional for plain objects,\nRequired when setting `object` to a non-serializable object (e.g. an HTMLElement)\nProperty is an Array of strings\nAttribute is a comma-separated string",
+          "type": "string[]"
         }
       ],
       "properties": [
         {
           "name": "object",
-          "description": "Object to display",
-          "type": "object"
+          "attribute": "object",
+          "description": "JavaScript Object to display\nSetting this property will override `<script type=\"application/json\">` children",
+          "type": "string|object"
         },
         {
           "name": "allowlist",
           "attribute": "allowlist",
-          "description": "allowlist of keys for the object.\nRequired if setting `object` to a non-serializable object (e.g. an HTMLElement)",
-          "type": "string|string[]"
+          "description": "User-defined allowlist of top-level keys for the object.\nOptional for plain objects,\nRequired when setting `object` to a non-serializable object (e.g. an HTMLElement)\nProperty is an Array of strings\nAttribute is a comma-separated string",
+          "type": "string[]"
+        },
+        {
+          "name": "error",
+          "description": "JSON.parse error",
+          "type": "Error"
+        }
+      ],
+      "events": [
+        {
+          "name": "json-parse-error",
+          "description": "when JSON parse fails"
         }
       ],
       "slots": [
         {
           "name": "",
-          "description": "JSON strings appended as text nodes will be parsed and displayed"
+          "description": "JSON scripts or JSON strings appended as text nodes will be parsed and displayed"
         }
       ],
       "cssProperties": [
@@ -65,6 +82,26 @@
         {
           "name": "code",
           "description": "the wrapping `<code>` element"
+        },
+        {
+          "name": "key",
+          "description": "property keys"
+        },
+        {
+          "name": "boolean",
+          "description": "boolean property values"
+        },
+        {
+          "name": "number",
+          "description": "number property values"
+        },
+        {
+          "name": "null",
+          "description": "null property values"
+        },
+        {
+          "name": "string",
+          "description": "string property values"
         }
       ]
     }

@@ -10,45 +10,60 @@ CSS Custom Properties listed below, you should customize both light and dark the
 ## Examples
 
 ```javascript
-const properties = {foo: 'foo', bar: 'bar', baz: 'baz'};
-const template = html`<json-viewer .object="${properties}" allowlist="foo,bar"></json-viewer>`;
-render(template, document.body);
+import '/path/to/json-viewer.js';
+const viewer = document.createElement('json-viewer');
+      viewer.allowlist = ['foo', 'bar'];
+      viewer.object = {
+        foo: 'foo',
+        bar: 'bar',
+        baz: 'baz',
+      };
 ```
 
 ```html
+<script type="module" src="/path/to/json-viewer.js"></script>
+
 <json-viewer allowlist="meenie,minie">
   <script type="application/json">
     {
       "eenie": 1,
       "meenie": true,
-      "minie": [{
-        "mo": "catch a tiger by the toe"
-      }]
+      "minie": [{ "mo": "catch a tiger by the toe" }]
     }
   </script>
 </json-viewer>
 ```
 
-![Example Render](example.png)
-
 ## Properties
 
-| Property    | Attribute   | Type               | Description                                      |
-|-------------|-------------|--------------------|--------------------------------------------------|
-| `allowlist` | `allowlist` | `string\|string[]` | allowlist of keys for the object.<br />Required if setting `object` to a non-serializable object (e.g. an HTMLElement) |
-| `object`    |             | `object`           | Object to display                                |
+| Property    | Attribute   | Type             | Description                                      |
+|-------------|-------------|------------------|--------------------------------------------------|
+| `allowlist` | `allowlist` | `string[]`       | User-defined allowlist of top-level keys for the object.<br />Optional for plain objects,<br />Required when setting `object` to a non-serializable object (e.g. an HTMLElement)<br />Property is an Array of strings<br />Attribute is a comma-separated string |
+| `error`     |             | `Error`          | JSON.parse error                                 |
+| `object`    | `object`    | `string\|object` | JavaScript Object to display<br />Setting this property will override `<script type="application/json">` children |
+
+## Events
+
+| Event              | Type               | Description           |
+|--------------------|--------------------|-----------------------|
+| `json-parse-error` | `CustomEvent<any>` | when JSON parse fails |
 
 ## Slots
 
 | Name | Description                                      |
 |------|--------------------------------------------------|
-|      | JSON strings appended as text nodes will be parsed and displayed |
+|      | JSON scripts or JSON strings appended as text nodes will be parsed and displayed |
 
 ## CSS Shadow Parts
 
-| Part   | Description                   |
-|--------|-------------------------------|
-| `code` | the wrapping `<code>` element |
+| Part      | Description                   |
+|-----------|-------------------------------|
+| `boolean` | boolean property values       |
+| `code`    | the wrapping `<code>` element |
+| `key`     | property keys                 |
+| `null`    | null property values          |
+| `number`  | number property values        |
+| `string`  | string property values        |
 
 ## CSS Custom Properties
 
