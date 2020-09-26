@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>&lt;json-viewer&gt; Demo</title>
-  <script type="module" src="./json-viewer.js"></script>
+  <title>&lt;json-viewer&gt;</title>
+  <script type="module" src="https://unpkg.com/@power-elements/json-viewer?module"></script>
   <style>
     html,
     body {
@@ -16,6 +16,9 @@
       display: block;
     }
 
+    a { color: lightskyblue }
+    a:visited { color: lightblue }
+
     @media (prefers-color-scheme: dark) {
       body {
         background: #212529;
@@ -25,84 +28,88 @@
   </style>
 </head>
 <body>
-  <hgroup>
-    <h1>&lt;json-viewer&gt; Demo</h1>
-  </hgroup>
+  <header>
+    <h1>&lt;json-viewer&gt;</h1>
+    <p>A single-file, zero-dependency custom element that renders syntax-highlighted JSON</p>
+    <p>❤️ Proudly uses <a href="https://open-wc.org" rel="noopener noreferrer">open-wc</a> tools and recommendations.</p>
+  </header>
 
-  <section>
-    <hgroup>
-      <h2>Using JSON Script Elements</h2>
-      <h3>Regular JSON</h3>
-    </hgroup>
+  <main>
+    <section>
+      <hgroup>
+        <h2>Using JSON Script Elements</h2>
+        <h3>Regular JSON</h3>
+      </hgroup>
 
-    <json-viewer>
-      <script type="application/json">
-        {
-          "one": 1
-        }
-      </script>
-    </json-viewer>
+      <json-viewer>
+        <script type="application/json">
+          {
+            "one": 1
+          }
+        </script>
+      </json-viewer>
 
-  </section>
+    </section>
 
-  <section>
-    <h3>JSON with Linked Data</h3>
+    <section>
+      <h3>JSON with Linked Data</h3>
 
-    <json-viewer>
-      <script type="application/ld+json">
-        {
-          "@context": "https://json-ld.org/contexts/person.jsonld",
-          "@id": "http://dbpedia.org/resource/John_Lennon",
-          "name": "John Lennon",
-          "born": "1940-10-09",
-          "spouse": "http://dbpedia.org/resource/Cynthia_Lennon"
-        }
-      </script>
-    </json-viewer>
+      <json-viewer>
+        <script type="application/ld+json">
+          {
+            "@context": "https://json-ld.org/contexts/person.jsonld",
+            "@id": "http://dbpedia.org/resource/John_Lennon",
+            "name": "John Lennon",
+            "born": "1940-10-09",
+            "spouse": "http://dbpedia.org/resource/Cynthia_Lennon"
+          }
+        </script>
+      </json-viewer>
 
-  </section>
+    </section>
 
-  <section>
-    <h2>Using the Object Attribute</h2>
+    <section>
+      <h2>Using the Object Attribute</h2>
 
-    <json-viewer object='{"one":1}'></json-viewer>
-  </section>
+      <json-viewer object='{"one":1}'></json-viewer>
+    </section>
 
-  <section>
-    <hgroup>
-      <h2>Errors</h2>
-      <h3>Bad JSON Attribute</h3>
-    </hgroup>
+    <section>
+      <hgroup>
+        <h2>Errors</h2>
+        <h3>Bad JSON Attribute</h3>
+      </hgroup>
 
-    <json-viewer object='{one:1}'></json-viewer>
-  </section>
+      <json-viewer object='{one:1}'></json-viewer>
+    </section>
 
-  <section>
-    <hgroup>
-      <h2>Using JavaScript</h2>
-      <h3>Setting the <code>object</code> property</h3>
-    </hgroup>
+    <section>
+      <hgroup>
+        <h2>Using JavaScript</h2>
+        <h3>Setting the <code>object</code> property</h3>
+      </hgroup>
 
-    <json-viewer id="objectProperty"></json-viewer>
+      <json-viewer id="objectProperty"></json-viewer>
 
-    <button onclick="objectProperty.object = {type: 'object'}">Set as Object</button>
-    <button onclick='objectProperty.object = `{"type": "string"}`'>Set as String</button>
-    <button onclick='objectProperty.object = `{type: }`'>Set as Invalid String</button>
+      <button onclick="objectProperty.object = {type: 'object'}">Set as Object</button>
+      <button onclick='objectProperty.object = `{"type": "string"}`'>Set as String</button>
+      <button onclick='objectProperty.object = `{type: }`'>Set as Invalid String</button>
 
-    <h3>Handling Errors</h3>
+      <h3>Handling Errors</h3>
 
-    <json-viewer id="firesError"></json-viewer>
+      <json-viewer id="firesError"></json-viewer>
 
-    <pre>
-      <output id="firesErrorOutput"></output>
-    </pre>
+      <pre>
+        <output id="firesErrorOutput"></output>
+      </pre>
 
-    <button onclick="firesError.object = '{type: }'">Set as Object</button>
+      <button onclick="firesError.object = '{type: }'">Set as Object</button>
 
-    <h3>Objects with HTMLElement properties</h3>
+      <h3>Objects with HTMLElement properties</h3>
 
-    <json-viewer id="elementProps"></json-viewer>
-  </section>
+      <json-viewer id="elementProps"></json-viewer>
+    </section>
+  </main>
 
   <script>
     firesError.addEventListener('json-parse-error', event => {

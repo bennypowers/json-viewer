@@ -256,9 +256,9 @@ export class JsonViewer extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     if ('adoptedStyleSheets' in Document.prototype) {
       const styles = new CSSStyleSheet();
-      // @ts-expect-error
+      // @ts-expect-error: proposal spec
       styles.replaceSync(css);
-      // @ts-expect-error
+      // @ts-expect-error: proposal spec
       this.shadowRoot.adoptedStyleSheets = [styles];
     } else
       this.shadowRoot.innerHTML = `<style>${css}</style>`;

@@ -5,6 +5,15 @@
   "type": "module",
   "main": "json-viewer.js",
   "module": "json-viewer.js",
+  "keywords": [
+    "json",
+    "viewer",
+    "javascript",
+    "custom element",
+    "zero-dependency",
+    "web component"
+  ],
+  "types": "json-viewer.d.ts",
   "scripts": {
     "build": "run-s build:*",
     "build:pretsc": "rm -f json-viewer.d.ts",
@@ -20,6 +29,7 @@
     "test:prune-snapshots": "wtr --node-resolve --prune-snapshots"
   },
   "author": "Benny Powers <web@bennypowers.com>",
+  "homepage": "https://bennypowers.dev/json-viewer",
   "repository": "github:bennypowers/json-viewer",
   "license": "ISC",
   "devDependencies": {
