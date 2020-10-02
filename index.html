@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>&lt;json-viewer&gt;</title>
+  <link rel="preload" as="script" href="https://unpkg.com/zero-md@1.4.0/build/zero-md.min.js">
+  <link rel="preload" as="style" href="https://unpkg.com/prism-themes@1.4.0/themes/prism-atom-dark.css">
+  <script type="module" src="https://unpkg.com/@power-elements/card?module"></script>
   <script type="module" src="https://unpkg.com/@power-elements/json-viewer?module"></script>
   <style>
     html,
@@ -12,14 +15,46 @@
       font-family: sans-serif;
     }
 
+    main {
+      transition: opacity 0.2s ease-in-out;
+      will-change: opacity;
+      opacity: 1;
+      display: grid;
+      gap: 16px;
+    }
+
+    @media (min-width: 800px) {
+      main {
+        grid-template-columns: 1fr 2fr;
+      }
+    }
+
+    main[unresolved] {
+      opacity: 0;
+    }
+
     output {
       display: block;
+    }
+
+    json-viewer {
+      background: none;
     }
 
     a { color: lightskyblue }
     a:visited { color: lightblue }
 
+    h1 a {
+      width: 24px;
+      display: inline-block;
+    }
+
     @media (prefers-color-scheme: dark) {
+      html {
+        --p-card-background-elevation1: #eee1;
+        --p-card-background-elevation2: #ddd1;
+        --p-card-divider: #eee1;
+      }
       body {
         background: #212529;
         color: white;
@@ -29,17 +64,22 @@
 </head>
 <body>
   <header>
-    <h1>&lt;json-viewer&gt;</h1>
+    <h1>
+      &lt;json-viewer&gt;
+      <a href="https://github.com/bennypowers/json-viewer">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 16" fill="none">
+          <title>GitHub</title>
+          <path fill="currentColor" fill-rule="evenodd" d="M8.18391.249268C3.82241.249268.253906 3.81777.253906 8.17927c0 3.46933 2.279874 6.44313 5.451874 7.53353.3965.0991.49563-.1983.49563-.3965v-1.3878c-2.18075.4956-2.67638-.9912-2.67638-.9912-.3965-.8922-.89212-1.1895-.89212-1.1895-.69388-.4957.09912-.4957.09912-.4957.793.0992 1.1895.793 1.1895.793.69388 1.2887 1.88338.8922 2.27988.6939.09912-.4956.29737-.8921.49562-1.0904-1.78425-.1982-3.5685-.8921-3.5685-3.96496 0-.89212.29738-1.586.793-2.08162-.09912-.19825-.3965-.99125.09913-2.08163 0 0 .69387-.19825 2.18075.793.59475-.19825 1.28862-.29737 1.9825-.29737.69387 0 1.38775.09912 1.98249.29737 1.4869-.99125 2.1808-.793 2.1808-.793.3965 1.09038.1982 1.88338.0991 2.08163.4956.59475.793 1.28862.793 2.08162 0 3.07286-1.8834 3.66766-3.66764 3.86586.29737.3965.59474.8921.59474 1.586v2.1808c0 .1982.0991.4956.5948.3965 3.172-1.0904 5.4518-4.0642 5.4518-7.53353-.0991-4.3615-3.6676-7.930002-8.02909-7.930002z" clip-rule="evenodd"></path>
+        </svg>
+      </a>
+    </h1>
     <p>A single-file, zero-dependency custom element that renders syntax-highlighted JSON</p>
-    <p>❤️ Proudly uses <a href="https://open-wc.org" rel="noopener noreferrer">open-wc</a> tools and recommendations.</p>
+    <p>❤️ Proudly uses <a href="https://open-wc.org" target="_blank" rel="noopener noreferrer">open-wc</a> tools and recommendations.</p>
   </header>
 
-  <main>
-    <section>
-      <hgroup>
-        <h2>Using JSON Script Elements</h2>
-        <h3>Regular JSON</h3>
-      </hgroup>
+  <main unresolved>
+    <p-card>
+      <h2 slot="heading">Using JSON Script Elements - Regular JSON</h2>
 
       <json-viewer>
         <script type="application/json">
@@ -49,10 +89,10 @@
         </script>
       </json-viewer>
 
-    </section>
+    </p-card>
 
-    <section>
-      <h3>JSON with Linked Data</h3>
+    <p-card>
+      <h3 slot="heading">JSON with Linked Data</h3>
 
       <json-viewer>
         <script type="application/ld+json">
@@ -66,36 +106,30 @@
         </script>
       </json-viewer>
 
-    </section>
+    </p-card>
 
-    <section>
-      <h2>Using the Object Attribute</h2>
-
+    <p-card>
+      <h2 slot="heading">Using the Object Attribute</h2>
       <json-viewer object='{"one":1}'></json-viewer>
-    </section>
+    </p-card>
 
-    <section>
-      <hgroup>
-        <h2>Errors</h2>
-        <h3>Bad JSON Attribute</h3>
-      </hgroup>
-
+    <p-card>
+      <h2 slot="heading">Errors - Bad JSON Attribute</h2>
       <json-viewer object='{one:1}'></json-viewer>
-    </section>
+    </p-card>
 
-    <section>
-      <hgroup>
-        <h2>Using JavaScript</h2>
-        <h3>Setting the <code>object</code> property</h3>
-      </hgroup>
+    <p-card>
+      <h2 slot="heading">Using JavaScript - Setting the <code>object</code> property</h2>
 
       <json-viewer id="objectProperty"></json-viewer>
 
-      <button onclick="objectProperty.object = {type: 'object'}">Set as Object</button>
-      <button onclick='objectProperty.object = `{"type": "string"}`'>Set as String</button>
-      <button onclick='objectProperty.object = `{type: }`'>Set as Invalid String</button>
+      <button slot="actions" onclick="objectProperty.object = {type: 'object'}">Set as Object</button>
+      <button slot="actions" onclick='objectProperty.object = `{"type": "string"}`'>Set as String</button>
+      <button slot="actions" onclick='objectProperty.object = `{type: }`'>Set as Invalid String</button>
+    </p-card>
 
-      <h3>Handling Errors</h3>
+    <p-card>
+      <h3 slot="heading">Handling Errors</h3>
 
       <json-viewer id="firesError"></json-viewer>
 
@@ -103,17 +137,23 @@
         <output id="firesErrorOutput"></output>
       </pre>
 
-      <button onclick="firesError.object = '{type: }'">Set as Object</button>
+      <button slot="actions" onclick="firesError.object = '{type: }'">Set as Object</button>
+    </p-card>
 
-      <h3>Objects with HTMLElement properties</h3>
-
+    <p-card>
+      <h3 slot="heading">Objects with HTMLElement properties</h3>
       <json-viewer id="elementProps"></json-viewer>
-    </section>
+    </p-card>
+
   </main>
 
-  <script>
+  <script type="module">
+    const firesError = document.getElementById('firesError');
+    const firesErrorOutput = document.getElementById('firesErrorOutput');
+    const elementProps = document.getElementById('elementProps');
+
     firesError.addEventListener('json-parse-error', event => {
-      console.log(event);
+      console.log(event); // eslint-disable-line no-console
       firesErrorOutput.textContent += `${event.type} fired. Check Console.\n`;
       setElementProps();
     });
@@ -129,6 +169,34 @@
       }
       elementProps.object = { viewerElement, error };
     }
-  </script>
-</body>
+
+    function appendMarkdown(card) {
+      const script = document.createElement('script');
+      const { outerHTML } = card.querySelector('json-viewer');
+      script.type = 'text/markdown';
+      script.textContent = `\`\`\`html\n      ${outerHTML}\n\`\`\``;
+      const zeroMd = document.createElement('zero-md');
+      if (matchMedia('(prefers-color-scheme: dark)').matches)
+        zeroMd.setAttribute('css-urls', '["https://unpkg.com/prism-themes@1.4.0/themes/prism-atom-dark.css"]');
+
+      zeroMd.appendChild(script);
+      card.parentNode.insertBefore(zeroMd, card.nextElementSibling);
+    }
+
+
+    async function main() {
+      await customElements.whenDefined('p-card');
+      await customElements.whenDefined('json-viewer');
+      await customElements.whenDefined('zero-md');
+
+      for (const card of document.querySelectorAll('p-card'))
+        appendMarkdown(card);
+
+      document.querySelector('main').removeAttribute('unresolved');
+    }
+
+    main();
+    </script>
+    <script src="https://unpkg.com/zero-md@1.4.0/build/zero-md.min.js"></script>
+  </body>
 </html>
